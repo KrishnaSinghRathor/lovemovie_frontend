@@ -1,5 +1,5 @@
 // VITE_API_URL is empty in local dev (Vite proxies /api and /ws) and the Render URL in production.
-export const API = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+export const API = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 export const WS_BASE = API ? API.replace(/^http/, "ws") : `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}`;
 let csrf = "";
 export const setCsrf = (t) => { csrf = t || ""; };
