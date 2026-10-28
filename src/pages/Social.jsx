@@ -68,6 +68,7 @@ export function VoicePanel({ rs, admin }) {
 }
 
 export default function Social({ rs, admin }) {
+  const inputRef = useRef(null);
   const [active, setActive] = useState(false);
   const [text, setText] = useState("");
   const [notification, setNotification] = useState(null);
@@ -76,6 +77,14 @@ export default function Social({ rs, admin }) {
   const previousIds = useRef(new Set());
   const initialized = useRef(false);
   const notificationTimer = useRef(null);
+
+  useEffect(() => {
+  if (active) {
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+  }
+}, [active]);
 
   useEffect(() => {
     const messages = rs.chat || [];
@@ -280,6 +289,7 @@ useEffect(() => {
 
           <form onSubmit={submit} className="flex gap-2 border-t border-white/10 p-2">
             <input
+            ref={inputRef}
               className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm outline-none focus:border-violet-400"
               maxLength={500}
               value={text}
