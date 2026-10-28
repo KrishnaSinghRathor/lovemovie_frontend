@@ -73,11 +73,14 @@ export default function Room() {
         <div><h1 className="text-xl font-semibold">{movie.title}</h1><p className="text-sm text-neutral-500">Hosted by {info.admin}{info.room_code && <> · code <span className="font-mono tracking-widest text-violet-300">{info.room_code}</span></>}</p></div>
         {banner && <p className="rounded-lg bg-amber-950/50 p-3 text-sm text-amber-300">{banner}</p>}
         {rs.error && rs.conn === "open" && <p className="rounded-lg bg-red-950/50 p-3 text-sm text-red-300">{rs.error}</p>}
-        <div
-            ref={playerShell}
-            className="relative overflow-hidden rounded-2xl border border-white/10 bg-black"
-          >
-          {url ? <video ref={vid} src={url} className="aspect-video w-full" playsInline disablePictureInPicture tabIndex={-1} onContextMenu={(e) => e.preventDefault()}
+       <div
+  ref={playerShell}
+  className="relative overflow-hidden rounded-2xl border border-white/10 bg-black
+             [&:fullscreen]:flex [&:fullscreen]:h-screen
+             [&:fullscreen]:w-screen [&:fullscreen]:items-center
+             [&:fullscreen]:justify-center [&:fullscreen]:rounded-none"
+>
+          {url ? <video ref={vid} src={url} className="block h-auto max-h-full w-full object-contain" playsInline disablePictureInPicture tabIndex={-1} onContextMenu={(e) => e.preventDefault()}
                    onError={() => setDl({ status: "error", done: 0, msg: "Your browser cannot play this file (unsupported codec). Try Chrome or Edge." })}>  {subs.tracks.map((t) => <track key={t.id} id={t.id} kind="subtitles" label={t.label} srcLang={t.lang || "en"} src={t.url} />)}</video>
                : <div className="flex aspect-video items-center justify-center text-sm text-neutral-500">Download the movie to join playback</div>}
           {url && blocked && <button className="absolute inset-0 bg-black/70 text-lg" onClick={() => vid.current.play().then(() => setBlocked(false))}>Click to enable playback</button>}
