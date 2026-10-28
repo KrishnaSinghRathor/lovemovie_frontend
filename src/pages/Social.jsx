@@ -10,6 +10,8 @@ export function VoicePanel({ rs, admin }) {
     rs.participants.map((p) => [p.user_id, p.username])
   );
 
+
+
   return (
     <div className="card space-y-2">
       <div className="flex items-center justify-between">
@@ -68,11 +70,58 @@ export function VoicePanel({ rs, admin }) {
 export default function Social({ rs, admin }) {
   const [active, setActive] = useState(false);
   const [text, setText] = useState("");
+  const [notification, setNotification] = useState(null);
+
   const end = useRef(null);
+  const previousIds = useRef(new Set());
+  const initialized = useRef(false);
+  const notificationTimer = useRef(null);
 
   useEffect(() => {
-    if (active) end.current?.scrollIntoView({ block: "nearest" });
-  }, [rs.chat.length, active]);
+    const messages = rs.chat || [];
+
+    // Don't show old chat history as new notifications on initial load.
+    if (!initialized.current) {
+      previousIds.current = new Set(messages.map((m) => m.id));
+      initialized.current = true;
+      return;
+    }
+
+    const newMessages = messages.filter(
+      (m) => !previousIds.current.has(m.id)
+    );
+
+    previousIds.current = new Set(messages.map((m) => m.id));
+
+    // Display the newest message from another participant.
+    const incoming = newMessages.filter(
+      (m) => m.user_id !== rs.you
+    );
+
+    if (incoming.length > 0) {
+      const message = incoming[incoming.length - 1];
+
+      setNotification(message);
+
+      clearTimeout(notificationTimer.current);
+      notificationTimer.current = setTimeout(() => {
+        setNotification(null);
+      }, 4000);
+    }
+  }, [rs.chat, rs.you]);
+
+  useEffect(() => {
+    return () => clearTimeout(notificationTimer.current);
+  }, []);
+
+useEffect(() => {
+  if (!active) return;
+
+  end.current?.scrollIntoView({
+    behavior: "smooth",
+    block: "end",
+  });
+}, [rs.chat, active]);
 
   const submit = (e) => {
     e.preventDefault();
@@ -83,6 +132,51 @@ export default function Social({ rs, admin }) {
 
   return (
     <div className="absolute bottom-4 right-4 z-30 w-80 max-w-[calc(100%-2rem)]">
+      {notification && (
+  <button
+    type="button"
+    onClick={() => {
+      setActive(true);
+      setNotification(null);
+      clearTimeout(notificationTimer.current);
+    }}
+    className="mb-3 flex w-full items-start gap-3 rounded-xl border border-white/15 bg-neutral-900/95 p-3 text-left text-white shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-200"
+  >
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-600">
+      <MessageCircle size={18} />
+    </div>
+
+    <div className="min-w-0 flex-1">
+      <div className="mb-1 flex items-center justify-between gap-2">
+        <span className="truncate text-sm font-semibold">
+          {notification.username}
+        </span>
+        <span className="shrink-0 text-xs text-neutral-400">
+          Now
+        </span>
+      </div>
+
+      <p className="break-words text-sm text-neutral-200">
+        {notification.text}
+      </p>
+      <p className="mt-1 text-xs text-violet-300">
+        Click to open chat
+      </p>
+    </div>
+
+    <span
+      role="button"
+      className="text-neutral-400 hover:text-white"
+      onClick={(e) => {
+        e.stopPropagation();
+        setNotification(null);
+        clearTimeout(notificationTimer.current);
+      }}
+    >
+      <X size={16} />
+    </span>
+  </button>
+)}
       {!active ? (
         <form
           onSubmit={submit}
