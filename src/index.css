@@ -1,0 +1,8 @@
+@tailwind base;@tailwind components;@tailwind utilities;
+body{@apply bg-neutral-950 text-neutral-100 antialiased}
+.btn{@apply rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium hover:bg-violet-500 disabled:opacity-40 transition}
+.btn2{@apply rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm hover:bg-white/10 disabled:opacity-40 transition}
+.card{@apply rounded-2xl border border-white/10 bg-neutral-900/70 p-5}
+.inp{@apply w-full rounded-lg border border-white/10 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-violet-500}
+
+video::cue{background:rgba(0,0,0,.7);color:#fff;font-size:1.15em}
